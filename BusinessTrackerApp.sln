@@ -1,0 +1,62 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 25.0.1706.3
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessTrackerApp.Domain", "Core\Core\BusinessTrackerApp.Domain.csproj", "{2A746F57-A736-4E86-8370-7F501B193899}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{92EF8E29-7155-4755-B5F2-F69662A1E039}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{F467BF2C-8BE3-4538-A197-DF7338CB43F8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentation", "{DB7A2BBA-D41E-40EC-B33A-124DADA172FD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessTrackerApp.Persistence", "Infrastructure\BusinessTrackerApp.Persistence\BusinessTrackerApp.Persistence.csproj", "{B48110EE-9B54-4359-9392-91DDD907824B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessTrackerApp.API", "Presentation\BusinessTrackerApp.API\BusinessTrackerApp.API.csproj", "{E87952C7-FFC6-4B8F-9F81-A566D738F978}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessTrackerApp.Infrastructure", "Infrastructure\BusinessTrackerApp.Infrastructure\BusinessTrackerApp.Infrastructure.csproj", "{C77F567A-CC80-4AF8-ABCE-F0A3D703EBA3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessTrackerApp.Application", "Core\BusinessTrackerApp.Application\BusinessTrackerApp.Application.csproj", "{699342C1-C965-4766-8272-14DE4B946FFD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2A746F57-A736-4E86-8370-7F501B193899}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A746F57-A736-4E86-8370-7F501B193899}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A746F57-A736-4E86-8370-7F501B193899}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A746F57-A736-4E86-8370-7F501B193899}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B48110EE-9B54-4359-9392-91DDD907824B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B48110EE-9B54-4359-9392-91DDD907824B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B48110EE-9B54-4359-9392-91DDD907824B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B48110EE-9B54-4359-9392-91DDD907824B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E87952C7-FFC6-4B8F-9F81-A566D738F978}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E87952C7-FFC6-4B8F-9F81-A566D738F978}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E87952C7-FFC6-4B8F-9F81-A566D738F978}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E87952C7-FFC6-4B8F-9F81-A566D738F978}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C77F567A-CC80-4AF8-ABCE-F0A3D703EBA3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C77F567A-CC80-4AF8-ABCE-F0A3D703EBA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C77F567A-CC80-4AF8-ABCE-F0A3D703EBA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C77F567A-CC80-4AF8-ABCE-F0A3D703EBA3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{699342C1-C965-4766-8272-14DE4B946FFD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{699342C1-C965-4766-8272-14DE4B946FFD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{699342C1-C965-4766-8272-14DE4B946FFD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{699342C1-C965-4766-8272-14DE4B946FFD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6538E44B-F055-4AE2-B633-1258AC75E768}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{2A746F57-A736-4E86-8370-7F501B193899} = {92EF8E29-7155-4755-B5F2-F69662A1E039}
+		{B48110EE-9B54-4359-9392-91DDD907824B} = {F467BF2C-8BE3-4538-A197-DF7338CB43F8}
+		{E87952C7-FFC6-4B8F-9F81-A566D738F978} = {DB7A2BBA-D41E-40EC-B33A-124DADA172FD}
+		{C77F567A-CC80-4AF8-ABCE-F0A3D703EBA3} = {F467BF2C-8BE3-4538-A197-DF7338CB43F8}
+		{699342C1-C965-4766-8272-14DE4B946FFD} = {92EF8E29-7155-4755-B5F2-F69662A1E039}
+	EndGlobalSection
+EndGlobal
