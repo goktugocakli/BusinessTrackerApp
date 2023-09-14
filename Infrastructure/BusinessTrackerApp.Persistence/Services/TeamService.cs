@@ -1,10 +1,10 @@
 ﻿using System;
 using BusinessTrackerApp.Application.Abstractions.Services;
 using BusinessTrackerApp.Application.Exceptions;
-using BusinessTrackerApp.Application.Repositories.Employee;
 using BusinessTrackerApp.Application.Repositories.Team;
 using BusinessTrackerApp.Application.ViewModels.Team;
 using BusinessTrackerApp.Domain.Entities;
+using Microsoft.AspNetCore.Identity;
 
 namespace BusinessTrackerApp.Persistence.Services
 {
@@ -12,20 +12,20 @@ namespace BusinessTrackerApp.Persistence.Services
 	{
         readonly ITeamReadRepository _teamReadRepository;
         readonly ITeamWriteRepository _teamWriteRepository;
-        readonly IEmployeeReadRepository _employeeReadRepository;
+        readonly UserManager<Employee> _userManager;
 
-        public TeamService(ITeamWriteRepository teamWriteRepository, ITeamReadRepository teamReadRepository, IEmployeeReadRepository employeeReadRepository)
+        public TeamService(ITeamWriteRepository teamWriteRepository, ITeamReadRepository teamReadRepository,UserManager<Employee> userManager)
         {
             _teamWriteRepository = teamWriteRepository;
             _teamReadRepository = teamReadRepository;
-            _employeeReadRepository = employeeReadRepository;
+            _userManager = userManager;
         }
 
         public async void AddEmployee(ICollection<string> employeeIds)
         {
             foreach (var employeeId in employeeIds)
             {
-                Employee? employee = await _employeeReadRepository.FindByIdAsync(employeeId);
+                Employee? employee = await _userManager.FindByIdAsync(employeeId);
                 
 
             }
@@ -33,7 +33,7 @@ namespace BusinessTrackerApp.Persistence.Services
 
         public async void AddEmployee(string teamId, string employeeId)
         {
-            Employee? employee = await _employeeReadRepository.FindByIdAsync(employeeId);
+            Employee? employee = await _userManager.FindByIdAsync(employeeId);
             Team? team = await _teamReadRepository.FindByIdAsync(teamId);
             if (employee is not null && team is not null)
             {
@@ -86,7 +86,7 @@ namespace BusinessTrackerApp.Persistence.Services
             entity.DepartmentId = Guid.Parse(teamRequestVM.DepartmentId);
 
             if (teamRequestVM.LeaderId is not null)
-                entity.LeaderId = Guid.Parse(teamRequestVM.LeaderId);
+                entity.LeaderId = teamRequestVM.LeaderId;
 
             _teamWriteRepository.Update(entity);
             await _teamWriteRepository.SaveAsync();

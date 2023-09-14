@@ -5,6 +5,9 @@ using BusinessTrackerApp.Application.RequestParameters;
 using System.Text.Json;
 using System.Web;
 using BusinessTrackerApp.Application.Abstractions.Services;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using System.Data;
 
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -23,8 +26,23 @@ namespace BusinessTrackerApp.API.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin, Employee")]
         public IActionResult GetAll([FromQuery] EmployeeParameters parameters)
         {
+
+            string? userDepartment = User?.Claims?
+        .FirstOrDefault(c => c.Type == "DepartmentName")?.Value;
+
+            string[] roles = User?.Claims?
+                .Where(c => c.Type == ClaimTypes.Role)
+                .Select(c => c.Value)
+                .ToArray()!;
+
+            if(roles!.Any(role => role == "Employee") && userDepartment != parameters.DepartmentName)
+            {
+                throw new Exception("Yalnızca kendi departmanınızdaki kullanıcıları aratabilirsiniz.");
+            }
+
             var pagedResult = _employeeService.GetAllEmployees(parameters);
 
             Response.Headers.Add("X_Pagination", JsonSerializer.Serialize(pagedResult.metaData));
@@ -36,6 +54,7 @@ namespace BusinessTrackerApp.API.Controllers
         
 
         [HttpGet("{id}")]
+        [Authorize(Roles ="Admin, Employee")]
         public async Task<IActionResult> GetById([FromRoute]string id)
         {
             return Ok(await _employeeService.GetEmployeeByIdAsync(id));
@@ -45,6 +64,7 @@ namespace BusinessTrackerApp.API.Controllers
         
 
         [HttpPost]
+        [Authorize(Roles ="Admin")]
         public async Task<IActionResult> CreateEmployee([FromBody]CreateEmployeeRequestVM model)
         {
             var response = await _employeeService.CreateEmployeeAsync(model);
@@ -53,6 +73,7 @@ namespace BusinessTrackerApp.API.Controllers
 
 
         [HttpPut]
+        [Authorize(Roles ="Admin")]
         public async Task<IActionResult> UpdateEmployee([FromBody]UpdateEmployeeRequestVM request)
         {
             await _employeeService.UpdateEmployeeAsync(request);
@@ -61,13 +82,21 @@ namespace BusinessTrackerApp.API.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles ="Admin")]
         public async Task<IActionResult> DeleteEmployee([FromRoute]string id)
         {
             await _employeeService.DeleteEmployeeAsync(id);
             return Ok();
         }
 
-       
+        [HttpPost("assing-role-to-user")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> AssignRoleToEmployee([FromBody]AssignRoleToEmployeeRequestVM request)
+        {
+            await _employeeService.AssingRole(request.UserName, request.Role);
+            return Ok();
+        }
+
     }
 }
 

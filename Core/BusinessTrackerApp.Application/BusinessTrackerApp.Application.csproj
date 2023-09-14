@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <None Remove="Repositories\" />
-    <None Remove="Repositories\Employee\" />
     <None Remove="Repositories\Department\" />
     <None Remove="Repositories\Team\" />
     <None Remove="Repositories\DailyPlan\" />
@@ -36,7 +35,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Repositories\" />
-    <Folder Include="Repositories\Employee\" />
     <Folder Include="Repositories\Department\" />
     <Folder Include="Repositories\Team\" />
     <Folder Include="Repositories\DailyPlan\" />
@@ -63,7 +61,7 @@
     <Folder Include="Exceptions\ConflictException\" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.11" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.7.1" />

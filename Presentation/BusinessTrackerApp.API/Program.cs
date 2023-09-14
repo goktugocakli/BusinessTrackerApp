@@ -2,6 +2,7 @@
 using BusinessTrackerApp.Application;
 using FluentValidation.AspNetCore;
 using BusinessTrackerApp.API.Extensions;
+using BusinessTrackerApp.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,8 +22,15 @@ builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddInfrastructureServices();
 builder.Services.AddPersistanceServices();
 builder.Services.AddApplicationServices();
+
+builder.Services.AddHttpContextAccessor();
+
+builder.Services.ConfigureJWT(builder.Configuration);
+
+
 
 
 var app = builder.Build();
@@ -38,6 +46,7 @@ app.ConfigureExceptionHandler<Program>();
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

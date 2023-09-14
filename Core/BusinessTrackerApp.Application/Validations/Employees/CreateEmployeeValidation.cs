@@ -13,7 +13,7 @@ namespace BusinessTrackerApp.Application.Validations.Employees
 
         public CreateEmployeeValidation()
 		{
-			RuleFor(e => e.Name)
+			RuleFor(e => e.NameSurname)
 				.NotEmpty()
 				.NotNull()
 					.WithMessage("Lütfen çalışan adını boş bırakmayınız.");

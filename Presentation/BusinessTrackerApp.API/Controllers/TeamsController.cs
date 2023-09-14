@@ -3,6 +3,7 @@ using BusinessTrackerApp.Application.Abstractions.Services;
 
 using BusinessTrackerApp.Application.ViewModels.Team;
 using BusinessTrackerApp.Domain.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -22,6 +23,7 @@ namespace BusinessTrackerApp.API.Controllers
 
         // GET: api/values
         [HttpGet]
+        [Authorize]
         public IActionResult GetAll()
         {
             return Ok(_teamService.FindAll());
@@ -29,6 +31,7 @@ namespace BusinessTrackerApp.API.Controllers
 
         // GET api/values/5
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<IActionResult> GetById([FromRoute]string id)
         {
             Team team = await _teamService.GetByIdAsync(id);
@@ -37,6 +40,7 @@ namespace BusinessTrackerApp.API.Controllers
 
         // POST api/values
         [HttpPost]
+        [Authorize(Roles ="Admin")]
         public async Task<IActionResult> Post([FromBody] CreateTeamRequestVM teamRequestVM)
         {
             await _teamService.CreateTeamAsync(teamRequestVM);
@@ -46,6 +50,7 @@ namespace BusinessTrackerApp.API.Controllers
 
         // PUT api/values/5
         [HttpPut("{id}")]
+        [Authorize(Roles ="Admin")]
         public async Task<IActionResult> Put([FromBody] UpdateTeamRequestVM teamRequestVM)
         {
             await _teamService.UpdateTeamAsync(teamRequestVM);
@@ -55,6 +60,7 @@ namespace BusinessTrackerApp.API.Controllers
 
         // DELETE api/values/5
         [HttpDelete("{id}")]
+        [Authorize(Roles ="Admin")]
         public async Task<IActionResult> Delete([FromRoute]string id)
         {
             await _teamService.DeleteTeamAsync(id);

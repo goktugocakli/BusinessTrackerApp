@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Net.Mime;
+using System.Security.Authentication;
 using System.Text.Json;
 using BusinessTrackerApp.Application.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
@@ -25,6 +26,7 @@ namespace BusinessTrackerApp.API.Extensions
 						{
 							ConflictException => (int) HttpStatusCode.Conflict,
 							NotFoundException => (int) HttpStatusCode.NotFound,
+							AuthenticationException => (int) HttpStatusCode.Unauthorized,
 							_ => (int) HttpStatusCode.InternalServerError
 						} ;
 

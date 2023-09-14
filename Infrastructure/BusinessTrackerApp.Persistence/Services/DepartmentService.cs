@@ -5,6 +5,7 @@ using BusinessTrackerApp.Application.Exceptions;
 using BusinessTrackerApp.Application.Repositories.Department;
 using BusinessTrackerApp.Application.ViewModels.Department;
 using BusinessTrackerApp.Domain.Entities;
+using Microsoft.AspNetCore.Identity;
 
 namespace BusinessTrackerApp.Persistence.Services
 {
@@ -12,14 +13,13 @@ namespace BusinessTrackerApp.Persistence.Services
 	{
 		private readonly IDepartmentWriteRepository _departmentWriteRepository;
         private readonly IDepartmentReadRepository _departmentReadRepository;
+        private readonly UserManager<Employee> _userManager;
 
-        private readonly IMapper _mapper;
-
-        public DepartmentService(IDepartmentWriteRepository departmentWriteRepository, IDepartmentReadRepository departmentReadRepository, IMapper mapper)
+        public DepartmentService(IDepartmentWriteRepository departmentWriteRepository, IDepartmentReadRepository departmentReadRepository, UserManager<Employee> userManager)
         {
             _departmentWriteRepository = departmentWriteRepository;
             _departmentReadRepository = departmentReadRepository;
-            _mapper = mapper;
+            _userManager = userManager;
         }
 
 
@@ -47,7 +47,17 @@ namespace BusinessTrackerApp.Persistence.Services
             if (department is not null)
                 throw new DepartmentNameAlreadyExistException(createDepartmentRequest.Name);
 
-            department = _mapper.Map<Department>(createDepartmentRequest);
+            department = new Department()
+            {
+                Name = createDepartmentRequest.Name
+            };
+
+            if (!string.IsNullOrWhiteSpace(createDepartmentRequest.ManagerUserName))
+            {
+                Employee? employee = await _userManager.FindByNameAsync(createDepartmentRequest.ManagerUserName);
+                department.Manager = employee;
+            }
+
             await _departmentWriteRepository.AddAsync(department);
             await _departmentWriteRepository.SaveAsync();
         }
@@ -58,8 +68,17 @@ namespace BusinessTrackerApp.Persistence.Services
 
             department.Name = updateDepartmentRequest.Name;
 
-            if (updateDepartmentRequest.ManagerId is not null)
-                department.ManagerId = Guid.Parse(updateDepartmentRequest.ManagerId);
+            if (!string.IsNullOrWhiteSpace(updateDepartmentRequest.ManagerUserName))
+            {
+                Employee? employee = await _userManager.FindByNameAsync(updateDepartmentRequest.ManagerUserName);
+
+                if(employee is not null)
+                    department.Manager = employee;
+            }
+            else
+            {
+                department.Manager = null;
+            }
 
             _departmentWriteRepository.Update(department);
             await _departmentWriteRepository.SaveAsync();

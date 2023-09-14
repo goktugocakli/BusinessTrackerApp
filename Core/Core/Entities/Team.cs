@@ -14,7 +14,7 @@ namespace BusinessTrackerApp.Domain.Entities
 		public Guid DepartmentId  { get; set; }
 		public Department Department { get; set; }
 
-		public Guid? LeaderId { get; set; }
+		public String? LeaderId { get; set; }
 		public Employee? Leader { get; set; }
 
 	}

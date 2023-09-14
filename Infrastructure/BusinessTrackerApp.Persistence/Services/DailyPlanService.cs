@@ -1,56 +1,46 @@
-﻿using System;
+﻿using AutoMapper;
 using BusinessTrackerApp.Application.Abstractions.Services;
+using BusinessTrackerApp.Application.DTOs.DailyPlan;
 using BusinessTrackerApp.Application.Exceptions;
 using BusinessTrackerApp.Application.Repositories.DailyPlan;
-using BusinessTrackerApp.Application.Repositories.Employee;
 using BusinessTrackerApp.Application.RequestParameters;
 using BusinessTrackerApp.Application.ViewModels.DailyPlan;
 using BusinessTrackerApp.Domain.Entities;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 
 namespace BusinessTrackerApp.Persistence.Services
 {
 	public class DailyPlanService : IDailyPlanService
 	{
+        private readonly IHttpContextAccessor _http;
 		readonly IDailyPlanReadRepository _dailyPlanReadRepository;
         readonly IDailyPlanWriteRepository _dailyPlanWriteRepository;
+        readonly UserManager<Employee> _userManager;
 
-        readonly IEmployeeReadRepository _employeeReadRepository;
+        readonly IMapper _mapper;
 
-        public DailyPlanService(IDailyPlanWriteRepository dailyPlanWriteRepository, IDailyPlanReadRepository dailyPlanReadRepository, IEmployeeReadRepository employeeReadRepository)
+        public DailyPlanService(IDailyPlanWriteRepository dailyPlanWriteRepository, IDailyPlanReadRepository dailyPlanReadRepository, IMapper mapper, UserManager<Employee> userManager, IHttpContextAccessor http)
         {
             _dailyPlanWriteRepository = dailyPlanWriteRepository;
             _dailyPlanReadRepository = dailyPlanReadRepository;
-            _employeeReadRepository = employeeReadRepository;
+            _mapper = mapper;
+            _userManager = userManager;
+            _http = http;
         }
 
-        public PagedList<DailyPlan> FindAll(DailyPlanParameters parameters)
+        public IEnumerable<DailyPlanDto> FindAll(DailyPlanParameters parameters)
         {
-            var dailyPlans = _dailyPlanReadRepository.FindByCondition(d => parameters.StartTime <= d.Date && d.Date <= parameters.EndTime);
+            var response = _dailyPlanReadRepository.FindAll(parameters, false);
 
-
-            if (!string.IsNullOrWhiteSpace(parameters.EmployeeId))
-            {
-                dailyPlans = dailyPlans.Where(d => d.EmployeeId == Guid.Parse(parameters.EmployeeId));
-            }
-
-            if (!string.IsNullOrWhiteSpace(parameters.DepartmentName))
-            {
-                dailyPlans = dailyPlans.Where(d => d.Employee.Department.Name == parameters.DepartmentName);
-
-                if (!string.IsNullOrWhiteSpace(parameters.TeamName))
-                {
-                    dailyPlans = dailyPlans.Where(d => d.Employee.Team.Name == parameters.TeamName);
-                }
-            }
-
-            var response = PagedList<DailyPlan>.ToPagedList(dailyPlans, parameters.PageNumber, parameters.PageSize);
-
-            return response;
+            return _mapper.Map<IEnumerable<DailyPlanDto>>(response);
+            
         }
 
-        public async Task<DailyPlan> FindByIdAsync(string id)
+        public async Task<DailyPlanDto> FindByIdAsync(string id)
         {
-            return await GetByIdAndCheckExistAsync(id);
+            var dailyPlan = await GetByIdAndCheckExistAsync(id);
+            return _mapper.Map<DailyPlanDto>(dailyPlan);
         }
 
         private async Task<DailyPlan> GetByIdAndCheckExistAsync(string id)
@@ -62,9 +52,11 @@ namespace BusinessTrackerApp.Persistence.Services
 
         public async Task  CreateDaiyPlanAsync(CreateDailyPlanRequestVM createDailyPlanRequest)
         {
-            Employee? employee = await _employeeReadRepository.FindByIdAsync(createDailyPlanRequest.EmployeeId);
+            string? userName = _http.HttpContext?.User.Identity?.Name;
+
+            Employee? employee = await _userManager.FindByNameAsync(userName!);
             if (employee is null)
-                throw new EmployeeNotFoundException(createDailyPlanRequest.EmployeeId);
+                throw new EmployeeNotFoundException(userName!);
 
             await _dailyPlanWriteRepository.AddAsync(new()
             {

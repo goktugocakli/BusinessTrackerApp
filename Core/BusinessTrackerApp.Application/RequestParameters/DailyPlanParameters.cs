@@ -3,12 +3,12 @@ namespace BusinessTrackerApp.Application.RequestParameters
 {
 	public class DailyPlanParameters : RequestParameters
 	{
-		public DateTime StartTime { get; set; } = DateTime.MinValue;
-		public DateTime EndTime { get; set; } = DateTime.MaxValue;
+		public DateOnly StartTime { get; set; } = DateOnly.FromDateTime(DateTime.MinValue);
+		public DateOnly EndTime { get; set; } = DateOnly.FromDateTime(DateTime.MaxValue);
 
 		public bool ValidTimeRange => EndTime > StartTime;
 
-		public string? EmployeeId { get; set; }
+		public string? EmployeeUserName { get; set; }
 
 		public string? DepartmentName { get; set; }
 

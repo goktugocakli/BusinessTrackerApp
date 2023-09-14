@@ -1,6 +1,7 @@
 ﻿using BusinessTrackerApp.Application.Abstractions.Services;
 using BusinessTrackerApp.Application.RequestParameters;
 using BusinessTrackerApp.Application.ViewModels.DailyPlan;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -19,7 +20,7 @@ namespace BusinessTrackerApp.API.Controllers
             _dailyPlanService = dailyPlanService;
         }
 
-        
+        [Authorize(Roles ="Admin, Employee")]
         [HttpGet]
         public IActionResult GetAll([FromQuery] DailyPlanParameters parameters)
         {
@@ -30,6 +31,7 @@ namespace BusinessTrackerApp.API.Controllers
 
         
         [HttpGet("{id}")]
+        [Authorize(Roles = "Employee, Admin")]
         public async Task<IActionResult> GetById([FromRoute]string id)
         {
             return Ok(await _dailyPlanService.FindByIdAsync(id));
@@ -37,6 +39,7 @@ namespace BusinessTrackerApp.API.Controllers
 
         
         [HttpPost]
+        [Authorize(Roles = "Employee")]
         public async Task<IActionResult> CreateDailyPlan([FromBody]CreateDailyPlanRequestVM dailyPlanRequest)
         {
             await _dailyPlanService.CreateDaiyPlanAsync(dailyPlanRequest);
@@ -47,6 +50,7 @@ namespace BusinessTrackerApp.API.Controllers
 
         
         [HttpPut]
+        [Authorize(Roles = "Employee")]
         public async Task<IActionResult> UpdateDailyPlan([FromBody] UpdateDailyPlanRequestVM dailyPlanRequest)
         {
             await _dailyPlanService.UpdateDailyPlanAsync(dailyPlanRequest);
@@ -54,6 +58,7 @@ namespace BusinessTrackerApp.API.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Employee")]
         public async Task<IActionResult> DeleteAsync([FromRoute]string id)
         {
             await _dailyPlanService.DeleteByIdAsync(id);
