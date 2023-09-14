@@ -3,12 +3,13 @@ using BusinessTrackerApp.Persistence.Context;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using BusinessTrackerApp.Persistence.Repositories;
-using BusinessTrackerApp.Application.Repositories.Employee;
 using BusinessTrackerApp.Application.Repositories.Department;
 using BusinessTrackerApp.Application.Repositories.Team;
 using BusinessTrackerApp.Application.Repositories.DailyPlan;
 using BusinessTrackerApp.Application.Abstractions.Services;
 using BusinessTrackerApp.Persistence.Services;
+using Microsoft.AspNetCore.Identity;
+using BusinessTrackerApp.Domain.Entities;
 
 namespace BusinessTrackerApp.Persistence
 {
@@ -20,8 +21,20 @@ namespace BusinessTrackerApp.Persistence
 				options.UseNpgsql(Configurations.ConnectionString));
 
 
-			service.AddScoped<IEmployeeReadRepository, EmployeeReadRepository>();
-			service.AddScoped<IEmployeeWriteRepository, EmployeeWriteRepository>();
+			service.AddIdentity<Employee, IdentityRole>(opts =>
+			{
+				opts.Password.RequireDigit = false;
+				opts.Password.RequireLowercase = false;
+				opts.Password.RequireUppercase = false;
+				opts.Password.RequireNonAlphanumeric = false;
+				opts.Password.RequiredLength = 3;
+
+				opts.User.RequireUniqueEmail = true;
+			})
+				.AddEntityFrameworkStores<BusinessTrackerDbContext>()
+				.AddDefaultTokenProviders();
+
+
 			service.AddScoped<IDepartmentReadRepository, DepartmentReadRepository>();
 			service.AddScoped<IDepartmentWriteRepository, DepartmentWriteRepository>();
 			service.AddScoped<ITeamReadRepository, TeamReadRepository>();
@@ -33,6 +46,7 @@ namespace BusinessTrackerApp.Persistence
 			service.AddScoped<ITeamService, TeamService>();
 			service.AddScoped<IDepartmentService, DepartmentService>();
 			service.AddScoped<IDailyPlanService, DailyPlanService>();
+			service.AddScoped<IAuthenticationService, AuthenticationService>();
 
 		}
 	}

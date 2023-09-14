@@ -13,9 +13,6 @@ namespace BusinessTrackerApp.Application.Validations.Departments
 				.NotEmpty()
 					.WithMessage("Lütfen Departman Name alanını boş bırakmayınız! ");
 
-			RuleFor(d => d.ManagerId)
-				.Matches(ValidationConstants.GuidRegex)
-				.WithMessage("Lütfen geçerli bir ManagerId giriniz. ManagerId alanı Guid veri tipinde olmalıdır.");
 		}
 	}
 }

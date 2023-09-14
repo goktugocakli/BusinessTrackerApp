@@ -5,8 +5,8 @@ namespace BusinessTrackerApp.Application.RequestParameters
 	{
 		const int maxPageSize = 50;
 
-		public int PageNumber { get; set; }
-		private int _pageSize;
+		public int PageNumber { get; set; } = 1;
+		private int _pageSize = 5;
 
 		public int PageSize
 		{

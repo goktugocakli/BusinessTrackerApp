@@ -11,7 +11,7 @@ namespace BusinessTrackerApp.Domain.Entities
 		public ICollection<Team> Teams { get; set; } = new HashSet<Team>();
 		public ICollection<Employee> Employees { get; set; } = new HashSet<Employee>();
 
-		public Guid? ManagerId { get; set; }
+		public String? ManagerId { get; set; }
 		public Employee? Manager { get; set; }
 
 

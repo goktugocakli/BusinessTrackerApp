@@ -16,6 +16,10 @@ namespace BusinessTrackerApp.Application.Abstractions.Services
 
 		Task UpdateEmployeeAsync(UpdateEmployeeRequestVM request);
         Task DeleteEmployeeAsync(string id);
+        Task AssingRole(string userName, string role);
+
+		Task<EmployeeDetailsDto> FindEmployeeDetailsAsync(string userName);
+
     }
 }
 

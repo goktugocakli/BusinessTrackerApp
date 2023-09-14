@@ -23,7 +23,7 @@ namespace BusinessTrackerApp.Application.Validations.DailyPlans
 				.NotNull()
 				.Custom((date, context) =>
 					{
-						DateTime today = DateTime.Today;
+						DateOnly today = DateOnly.FromDateTime(DateTime.Today);
 						int todayDayOfWeek = (int) today.DayOfWeek;
 						int dayOfWeek = (int) date.DayOfWeek;
 						if (dayOfWeek == 0 || dayOfWeek == 6)
@@ -32,11 +32,6 @@ namespace BusinessTrackerApp.Application.Validations.DailyPlans
 						if (!(today.AddDays(-(todayDayOfWeek - 1)) <= date && date < today.AddDays(6 - todayDayOfWeek)))
 							context.AddFailure("Yalnızca bulunduğunuz hafta için plan girebilirsiniz.");
 					});
-
-			RuleFor(p => p.EmployeeId)
-				.NotEmpty()
-				.NotNull()
-				.Matches(ValidationConstants.GuidRegex);
 		}
 	}
 }

@@ -24,7 +24,7 @@ namespace BusinessTrackerApp.Application.Validations.DailyPlans
                 .NotNull()
                 .Custom((date, context) =>
                 {
-                    DateTime today = DateTime.Today;
+                    DateOnly today = DateOnly.FromDateTime(DateTime.Today);
                     int todayDayOfWeek = (int)today.DayOfWeek;
                     int dayOfWeek = (int)date.DayOfWeek;
                     if (dayOfWeek == 0 || dayOfWeek == 6)

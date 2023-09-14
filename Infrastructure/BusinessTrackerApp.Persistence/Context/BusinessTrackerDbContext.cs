@@ -1,11 +1,13 @@
-﻿using System;
+﻿using System.Reflection;
 using BusinessTrackerApp.Domain.Entities;
 using BusinessTrackerApp.Domain.Entities.Common;
+using BusinessTrackerApp.Persistence.Config;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace BusinessTrackerApp.Persistence.Context
 {
-	public class BusinessTrackerDbContext : DbContext
+	public class BusinessTrackerDbContext : IdentityDbContext<Employee>
 	{
 		
         public BusinessTrackerDbContext(DbContextOptions options) : base(options)
@@ -19,12 +21,10 @@ namespace BusinessTrackerApp.Persistence.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Employee>()
-                .HasIndex(e => e.Mail)
-                .IsUnique();
-            modelBuilder.Entity<Employee>()
-                .HasIndex(e => e.Phone)
-                .IsUnique();
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.ApplyConfiguration(new RoleConfiguration());
+            
+
             modelBuilder.Entity<Department>()
                 .HasIndex(d => d.Name)
                 .IsUnique();
@@ -69,12 +69,11 @@ namespace BusinessTrackerApp.Persistence.Context
                 .HasConversion(
                     v => v.ToString(),
                     v => (Status)Enum.Parse(typeof(Status), v));
-            
-
         }
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
+            
             var datas = ChangeTracker.Entries<BaseEntity>();
             foreach (var data in datas)
             {

@@ -5,12 +5,13 @@ namespace BusinessTrackerApp.Application.DTOs.Employee
 {
 	public class EmployeeDetailsDto
 	{
-        public Guid Id { get; set; }
-        public string Name { get; set; }
-        public string Mail { get; set; }
-        public string Phone { get; set; }
-        public string Department { get; set; }
-        public string Team { get; set; }
+        public string Id { get; set; }
+        public string NameSurname { get; set; }
+        public string Username { get; set; }
+        public string Email { get; set; }
+        public string PhoneNumber { get; set; }
+        public string DepartmentName { get; set; }
+        public string? TeamName { get; set; }
         public List<DailyPlanDto> DailyPlanDtos { get; set; }
     }
 }
