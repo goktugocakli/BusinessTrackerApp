@@ -22,37 +22,33 @@ namespace BusinessTrackerApp.API.Controllers
         }
 
         
-
-        // GET: api/values
         [HttpGet]
         [Authorize]
         public IActionResult GetAll()
         {
-            IEnumerable<Department> departments = _departmentService.FindAll();
-            return Ok(departments);
+            return Ok(_departmentService.FindAll());
         }
 
        
-
-        [HttpGet("{id}")]
-        [Authorize]
-        public async Task<IActionResult> GetById([FromRoute] string id)
+        [HttpGet("{name}")]
+        //[Authorize]
+        public async Task<IActionResult> GetByName([FromRoute] string name)
         {
-            return Ok(await _departmentService.FindByIdAsync(id));
+            return Ok(await _departmentService.FindByNameAsync(name));
         }
 
         // POST api/values
         [HttpPost]
-        [Authorize(Roles ="Admin")]
+        //[Authorize(Roles ="Admin")]
         public async Task<IActionResult> Post([FromBody] CreateDepartmentRequestVM createDepartmentRequest)
         {
              await _departmentService.CreateDepartmentAsync(createDepartmentRequest);
             return Ok();
         }
 
-        // PUT api/values/5
+
         [HttpPut]
-        [Authorize(Roles ="Admin")]
+        //[Authorize(Roles ="Admin")]
         public async Task<IActionResult> Put([FromBody] UpdateDepartmentRequestVM updateDepartmentRequest)
         {
             await _departmentService.UpdateDepartmentAsync(updateDepartmentRequest);
@@ -60,13 +56,14 @@ namespace BusinessTrackerApp.API.Controllers
         }
 
         // DELETE api/values/5
-        [HttpDelete("{id}")]
+        [HttpDelete("{idOrName}")]
         [Authorize(Roles ="Admin")]
-        public async Task<IActionResult> Delete([FromRoute] string id)
+        public async Task<IActionResult> Delete([FromRoute] string idOrName)
         {
-            await _departmentService.DeleteDepartmentAsync(id);
+            await _departmentService.DeleteDepartmentAsync(idOrName);
             return Ok();
         }
+
 
     }
 }

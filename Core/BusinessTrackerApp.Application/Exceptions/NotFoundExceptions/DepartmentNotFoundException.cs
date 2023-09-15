@@ -5,7 +5,7 @@ namespace BusinessTrackerApp.Application.Exceptions
 	{
 		
 
-        public DepartmentNotFoundException(string id) : base($"the department with id: {id} could not found.")
+        public DepartmentNotFoundException(string name) : base($"the department with name: {name} could not found.")
         {
         }
     }

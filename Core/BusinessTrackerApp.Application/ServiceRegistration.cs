@@ -28,6 +28,8 @@ namespace BusinessTrackerApp.Application
 			services.AddScoped<IValidator<CreateDailyPlanRequestVM>, CreateDailyPlansRequestValidation>();
             services.AddScoped<IValidator<UpdateDailyPlanRequestVM>, UpdateDailyPlansRequestValidation>();
 
+			services.AddScoped<IValidator<ManipulateEmployeesIntoTeamRequest>, ManipulateEmployeesIntoTeamRequestValidation>();
+
 
         }
     }

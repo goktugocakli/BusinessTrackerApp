@@ -21,37 +21,36 @@ namespace BusinessTrackerApp.API.Controllers
             _teamService = teamService;
         }  
 
-        // GET: api/values
+
         [HttpGet]
-        [Authorize]
-        public IActionResult GetAll()
+        //[Authorize]
+        public IActionResult GetAllTeams()
         {
             return Ok(_teamService.FindAll());
         }
 
-        // GET api/values/5
+        
         [HttpGet("{id}")]
-        [Authorize]
-        public async Task<IActionResult> GetById([FromRoute]string id)
+        //[Authorize]
+        public async Task<IActionResult> GetTeamById([FromRoute]string id)
         {
-            Team team = await _teamService.GetByIdAsync(id);
-            return Ok(team);
+            return Ok(await _teamService.GetByIdAsync(id));
         }
 
-        // POST api/values
+        
         [HttpPost]
-        [Authorize(Roles ="Admin")]
-        public async Task<IActionResult> Post([FromBody] CreateTeamRequestVM teamRequestVM)
+        //[Authorize(Roles ="Admin")]
+        public async Task<IActionResult> CreateTeam([FromBody] CreateTeamRequestVM teamRequestVM)
         {
             await _teamService.CreateTeamAsync(teamRequestVM);
 
             return Ok();
         }
 
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        [Authorize(Roles ="Admin")]
-        public async Task<IActionResult> Put([FromBody] UpdateTeamRequestVM teamRequestVM)
+        
+        [HttpPut]
+        //[Authorize(Roles ="Admin")]
+        public async Task<IActionResult> UpdateTeam([FromBody] UpdateTeamRequestVM teamRequestVM)
         {
             await _teamService.UpdateTeamAsync(teamRequestVM);
 
@@ -60,12 +59,19 @@ namespace BusinessTrackerApp.API.Controllers
 
         // DELETE api/values/5
         [HttpDelete("{id}")]
-        [Authorize(Roles ="Admin")]
-        public async Task<IActionResult> Delete([FromRoute]string id)
+        //[Authorize(Roles ="Admin")]
+        public async Task<IActionResult> DeleteTeamById([FromRoute]string id)
         {
             await _teamService.DeleteTeamAsync(id);
             return Ok();
         }
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> ManipulateEmployeesInTeam([FromBody] ManipulateEmployeesIntoTeamRequest request)
+        {
+            await _teamService.ManipulateEmployeesAsync(request);
+            return Ok();
+        }  
 
         
     }

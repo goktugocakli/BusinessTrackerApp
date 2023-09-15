@@ -1,10 +1,13 @@
 ﻿using System;
+using AutoMapper;
 using BusinessTrackerApp.Application.Abstractions.Services;
+using BusinessTrackerApp.Application.DTOs.Employee;
+using BusinessTrackerApp.Application.DTOs.Team;
 using BusinessTrackerApp.Application.Exceptions;
 using BusinessTrackerApp.Application.Repositories.Team;
 using BusinessTrackerApp.Application.ViewModels.Team;
 using BusinessTrackerApp.Domain.Entities;
-using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace BusinessTrackerApp.Persistence.Services
 {
@@ -12,47 +15,52 @@ namespace BusinessTrackerApp.Persistence.Services
 	{
         readonly ITeamReadRepository _teamReadRepository;
         readonly ITeamWriteRepository _teamWriteRepository;
-        readonly UserManager<Employee> _userManager;
+        readonly IDepartmentService _departmentService;
+        readonly IMapper _mapper;
+        readonly IEmployeeService _employeeService;
 
-        public TeamService(ITeamWriteRepository teamWriteRepository, ITeamReadRepository teamReadRepository,UserManager<Employee> userManager)
+        public TeamService(ITeamWriteRepository teamWriteRepository, ITeamReadRepository teamReadRepository, IDepartmentService departmentService, IMapper mapper, IEmployeeService employeeService)
         {
             _teamWriteRepository = teamWriteRepository;
             _teamReadRepository = teamReadRepository;
-            _userManager = userManager;
-        }
-
-        public async void AddEmployee(ICollection<string> employeeIds)
-        {
-            foreach (var employeeId in employeeIds)
-            {
-                Employee? employee = await _userManager.FindByIdAsync(employeeId);
-                
-
-            }
-        }
-
-        public async void AddEmployee(string teamId, string employeeId)
-        {
-            Employee? employee = await _userManager.FindByIdAsync(employeeId);
-            Team? team = await _teamReadRepository.FindByIdAsync(teamId);
-            if (employee is not null && team is not null)
-            {
-                team.Employees.Add(employee);
-                _teamWriteRepository.Update(team);
-                await _teamWriteRepository.SaveAsync();
-            }
-            
+            _departmentService = departmentService;
+            _mapper = mapper;
+            _employeeService = employeeService;
         }
 
         public async Task CreateTeamAsync(CreateTeamRequestVM teamRequestVM)
         {
-            await _teamWriteRepository.AddAsync(new()
+            string? leaderId = null;
+
+            var departmentDto = await _departmentService.FindByNameAsync(teamRequestVM.DepartmentName);
+
+            if (!string.IsNullOrWhiteSpace(teamRequestVM.LeaderUsername))
+            {
+                var _ = await _employeeService.GetEmployeeByUsernameAsync(teamRequestVM.LeaderUsername);
+                leaderId = _.Id;
+            }
+
+            Team team = new()
             {
                 Name = teamRequestVM.Name,
-                DepartmentId = Guid.Parse(teamRequestVM.DepartmentId),
-            });
+                DepartmentId = Guid.Parse(departmentDto.Id),
+                LeaderId = leaderId
+            };
 
+            await AddEmployeeIntoTeam(teamRequestVM.EmployeeUsernames, team);
+
+            await _teamWriteRepository.AddAsync(team);
             await _teamWriteRepository.SaveAsync();
+        }
+
+        private async Task AddEmployeeIntoTeam(ICollection<string> employeeUsernames, Team team)
+        {
+            foreach (var username in employeeUsernames)
+            {
+                Employee employee = await _employeeService.GetEmployeeByUsernameAndCheckExist(username);
+
+                team.Employees.Add(employee);
+            }
         }
 
         public  IEnumerable<Team> FindAll()
@@ -63,32 +71,53 @@ namespace BusinessTrackerApp.Persistence.Services
 
         private async Task<Team> GetTeamByIdAndCheckExist(string id)
         {
-            Team? team = await _teamReadRepository.FindByIdAsync(id);
+            if(Guid.TryParse(id, out var guidResult))
+            {
+                Team? team = await _teamReadRepository.Table
+                    .Include(t => t.Department)
+                    .Include(t => t.Leader)
+                    .FirstOrDefaultAsync(e => e.Id == guidResult);
 
-            return team is null ? throw new TeamNotFoundException(id) : team;
+                return team ?? throw new NotFoundException(id);
+            }
+
+            throw new TeamNotFoundException(id) ;
         }
 
-        public async Task<Team> GetByIdAsync(string id)
+        public async Task<TeamDto> GetByIdAsync(string id)
         {
+            Team team = await GetTeamByIdAndCheckExist(id);
 
-            /*
-             * 
-             * Map fonksiyonu yazılacak
-             */
+            return new TeamDto()
+            {
+                Id = team.Id.ToString(),
+                Name = team.Name,
+                DepartmentName = team.Department.Name,
+                Leader = _mapper.Map<EmployeeDto>(team.Leader)
+            };
 
-            return await GetTeamByIdAndCheckExist(id);
         }
 
         public async Task UpdateTeamAsync(UpdateTeamRequestVM teamRequestVM)
         {
-            Team entity = await GetTeamByIdAndCheckExist(teamRequestVM.Id);
+            Team team = await GetTeamByIdAndCheckExist(teamRequestVM.Id);
 
-            entity.DepartmentId = Guid.Parse(teamRequestVM.DepartmentId);
+            var departmentDto = await _departmentService.FindByNameAsync(teamRequestVM.DepartmentName);
 
-            if (teamRequestVM.LeaderId is not null)
-                entity.LeaderId = teamRequestVM.LeaderId;
+            if (teamRequestVM.LeaderUsername is not null)
+            {
+                var _ = await _employeeService.GetEmployeeByUsernameAsync(teamRequestVM.LeaderUsername);
+                team.LeaderId = _.Id;
+            }
+            else
+            {
+                team.LeaderId = null;
+            }
 
-            _teamWriteRepository.Update(entity);
+            team.Name = teamRequestVM.Name;
+            team.DepartmentId = Guid.Parse(departmentDto.Id);
+
+            _teamWriteRepository.Update(team);
             await _teamWriteRepository.SaveAsync();
         }
 
@@ -101,6 +130,34 @@ namespace BusinessTrackerApp.Persistence.Services
         }
 
 
+        public async Task ManipulateEmployeesAsync(ManipulateEmployeesIntoTeamRequest request)
+        {
+            Team team = await GetTeamByIdAndCheckExist(request.TeamId);
+            
+
+            foreach(var employeeItem  in request.employeeUsernames)
+            {
+                Employee employee = await _employeeService.GetEmployeeByUsernameAndCheckExist(employeeItem.Username);
+
+                switch (employeeItem.Code)
+                {
+                    case Code.Delete:
+                        team.Employees.Remove(employee);
+                        break;
+
+                    case Code.Add:
+                        team.Employees.Add(employee);
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+
+            _teamWriteRepository.Update(team);
+            await _teamWriteRepository.SaveAsync();
+
+        }
 
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using BusinessTrackerApp.Application.DTOs.Team;
 using BusinessTrackerApp.Application.ViewModels.Team;
 using BusinessTrackerApp.Domain.Entities;
 
@@ -6,8 +7,7 @@ namespace BusinessTrackerApp.Application.Abstractions.Services
 {
 	public interface ITeamService
 	{
-		void AddEmployee(ICollection<string> employeeIds);
-		void AddEmployee(string teamId, string employeeId);
+		Task ManipulateEmployeesAsync(ManipulateEmployeesIntoTeamRequest request);
 
 		Task CreateTeamAsync(CreateTeamRequestVM teamRequestVM);
 
@@ -17,7 +17,7 @@ namespace BusinessTrackerApp.Application.Abstractions.Services
 
 		//Task<Team> GetTeamByIdAndCheckExist(string id);
 
-		Task<Team> GetByIdAsync(string id);
+		Task<TeamDto> GetByIdAsync(string id);
 
 		Task DeleteTeamAsync(string id);
     }

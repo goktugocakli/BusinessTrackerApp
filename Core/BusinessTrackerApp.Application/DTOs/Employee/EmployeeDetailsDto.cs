@@ -12,7 +12,7 @@ namespace BusinessTrackerApp.Application.DTOs.Employee
         public string PhoneNumber { get; set; }
         public string DepartmentName { get; set; }
         public string? TeamName { get; set; }
-        public List<DailyPlanDto> DailyPlanDtos { get; set; }
+        //public ICollection<DailyPlanDto> DailyPlanDtos { get; set; } = new HashSet<DailyPlanDto>();
     }
 }
 

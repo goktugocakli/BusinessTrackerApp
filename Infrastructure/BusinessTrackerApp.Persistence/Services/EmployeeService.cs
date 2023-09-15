@@ -31,22 +31,20 @@ namespace BusinessTrackerApp.Persistence.Services
 
             var employeesWithMetaData = PagedList<Employee>.ToPagedList(query, parameters.PageNumber, parameters.PageSize);
 
-            //var employeesWithMetaData = _employeeReadRepository.FindAll(parameters);
-
             var employeesDto = _mapper.Map<IEnumerable<EmployeeDto>>(employeesWithMetaData);
 
             return (employeesDto, employeesWithMetaData.MetaData);
         }
 
-        private async Task<Employee> GetEmployeeByIdAndCheckExist(string id)
+        public async Task<Employee> GetEmployeeByUsernameAndCheckExist(string username)
         {
-            Employee? employee = await _userManager.FindByIdAsync(id);
-            return employee ?? throw new EmployeeNotFoundException(id);
+            Employee? employee = await _userManager.FindByNameAsync(username);
+            return employee ?? throw new EmployeeNotFoundException(username);
         }
 
-        public async Task<EmployeeDto> GetEmployeeByIdAsync(string id)
+        public async Task<EmployeeDto> GetEmployeeByUsernameAsync(string username)
         {
-            Employee employee = await GetEmployeeByIdAndCheckExist(id);
+            Employee employee = await GetEmployeeByUsernameAndCheckExist(username);
             
             return _mapper.Map<EmployeeDto>(employee);
         }
@@ -77,8 +75,7 @@ namespace BusinessTrackerApp.Persistence.Services
 
         public async Task UpdateEmployeeAsync(UpdateEmployeeRequestVM request)
         {
-            Employee? employee = await GetEmployeeByIdAndCheckExist(request.Id);
-
+            Employee? employee = await GetEmployeeByUsernameAndCheckExist(request.Username);
 
             employee.NameSurname = request.Name;
             employee.Email = request.Mail;
@@ -102,7 +99,7 @@ namespace BusinessTrackerApp.Persistence.Services
         {
             IdentityResult result = new();
             
-            Employee? employee = await GetEmployeeByIdAndCheckExist(id);
+            Employee? employee = await GetEmployeeByUsernameAndCheckExist(id);
             if (employee is not null)
             {
                 result = await _userManager.DeleteAsync(employee);
@@ -115,14 +112,14 @@ namespace BusinessTrackerApp.Persistence.Services
 
         }
 
-        public async Task AssingRole(string userName, string role)
+        public async Task AssingRole(string userName, ICollection<string> roles)
         {
             Employee? employee = await _userManager.FindByNameAsync(userName);
 
             if (employee is null)
                 throw new EmployeeNotFoundException(userName);
-
-            await _userManager.AddToRoleAsync(employee, role);
+           
+            await _userManager.AddToRolesAsync(employee, roles);
 
         }
 
@@ -131,6 +128,7 @@ namespace BusinessTrackerApp.Persistence.Services
             EmployeeDetailsDto? emp = await _userManager.Users
                 .Where(u => u.UserName == userName)
                 .Include(u => u.Department)
+                .Include(u => u.Team)
                 .Select(u => new EmployeeDetailsDto
                 {
                     Id = u.Id,

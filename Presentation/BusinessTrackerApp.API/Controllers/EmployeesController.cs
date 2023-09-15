@@ -26,12 +26,12 @@ namespace BusinessTrackerApp.API.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Admin, Employee")]
+        [Authorize]
         public IActionResult GetAll([FromQuery] EmployeeParameters parameters)
         {
-
+            /*
             string? userDepartment = User?.Claims?
-        .FirstOrDefault(c => c.Type == "DepartmentName")?.Value;
+                .FirstOrDefault(c => c.Type == "DepartmentName")?.Value;
 
             string[] roles = User?.Claims?
                 .Where(c => c.Type == ClaimTypes.Role)
@@ -40,25 +40,24 @@ namespace BusinessTrackerApp.API.Controllers
 
             if(roles!.Any(role => role == "Employee") && userDepartment != parameters.DepartmentName)
             {
-                throw new Exception("Yalnızca kendi departmanınızdaki kullanıcıları aratabilirsiniz.");
+                return StatusCode(StatusCodes.Status403Forbidden, "Yalnızca kendi departmanınızdaki kullanıcıları aratabilirsiniz.");
             }
+            */
 
             var pagedResult = _employeeService.GetAllEmployees(parameters);
 
             Response.Headers.Add("X_Pagination", JsonSerializer.Serialize(pagedResult.metaData));
 
-            //var result = _mapper.Map<IEnumerable<EmployeeResponseVM>>(employees);
             return Ok(pagedResult.employeeDtos);
         }
 
         
 
-        [HttpGet("{id}")]
-        [Authorize(Roles ="Admin, Employee")]
-        public async Task<IActionResult> GetById([FromRoute]string id)
+        [HttpGet("{username}")]
+        [Authorize]
+        public async Task<IActionResult> GetByUsername([FromRoute]string username)
         {
-            return Ok(await _employeeService.GetEmployeeByIdAsync(id));
-
+            return Ok(await _employeeService.GetEmployeeByUsernameAsync(username));
         }
 
         
@@ -91,9 +90,9 @@ namespace BusinessTrackerApp.API.Controllers
 
         [HttpPost("assing-role-to-user")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> AssignRoleToEmployee([FromBody]AssignRoleToEmployeeRequestVM request)
+        public async Task<IActionResult> AssignRoleToEmployee([FromBody]AssignRolesToEmployeeRequestVM request)
         {
-            await _employeeService.AssingRole(request.UserName, request.Role);
+            await _employeeService.AssingRole(request.UserName, request.Roles);
             return Ok();
         }
 

@@ -10,15 +10,17 @@ namespace BusinessTrackerApp.Application.Abstractions.Services
 	{
         (IEnumerable<EmployeeDto> employeeDtos, MetaData metaData) GetAllEmployees(EmployeeParameters parameters);
 
-		Task<EmployeeDto> GetEmployeeByIdAsync(string id);
+		Task<EmployeeDto> GetEmployeeByUsernameAsync(string username);
 
 		Task<EmployeeDto> CreateEmployeeAsync(CreateEmployeeRequestVM model);
 
 		Task UpdateEmployeeAsync(UpdateEmployeeRequestVM request);
         Task DeleteEmployeeAsync(string id);
-        Task AssingRole(string userName, string role);
+        Task AssingRole(string userName, ICollection<string> roles);
 
 		Task<EmployeeDetailsDto> FindEmployeeDetailsAsync(string userName);
+
+		Task<Employee> GetEmployeeByUsernameAndCheckExist(string username);
 
     }
 }

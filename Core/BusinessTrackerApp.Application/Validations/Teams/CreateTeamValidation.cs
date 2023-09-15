@@ -13,20 +13,10 @@ namespace BusinessTrackerApp.Application.Validations.Teams
                 .NotNull();
             //.WithMessage("Lütfen Name alanını boş bırakmayınız.");
 
-            RuleFor(t => t.DepartmentId)
+            RuleFor(t => t.DepartmentName)
                 .NotEmpty()
-                .NotNull()
-                .Matches(ValidationConstants.GuidRegex);
+                .NotNull();
 
-
-            RuleFor(t => t.LeaderId)
-                .Matches(ValidationConstants.GuidRegex)
-                    .WithMessage("Lütfen geçerli bir Emloyee Id giriniz. Employee Id Guid veri yapısında olmalıdır.");
-                    
-
-            RuleForEach(t => t.EmployeesId)
-                .Matches(ValidationConstants.GuidRegex)
-                    .WithMessage("Lütfen geçerli Employee Id giriniz.");
         }
 	}
 }

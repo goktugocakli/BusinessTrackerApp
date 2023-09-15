@@ -6,9 +6,9 @@ namespace BusinessTrackerApp.Application.Abstractions.Services
 {
 	public interface IDepartmentService
 	{
-        IEnumerable<Department> FindAll();
+        IEnumerable<DepartmentResponseVM> FindAll();
 
-        Task<Department> FindByIdAsync(string id);
+        Task<DepartmentResponseVM> FindByNameAsync(string id);
 
         Task CreateDepartmentAsync(CreateDepartmentRequestVM createDepartmentRequest);
 

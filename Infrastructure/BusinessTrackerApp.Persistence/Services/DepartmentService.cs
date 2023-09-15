@@ -1,11 +1,13 @@
 ﻿using System;
 using AutoMapper;
 using BusinessTrackerApp.Application.Abstractions.Services;
+using BusinessTrackerApp.Application.DTOs.Employee;
 using BusinessTrackerApp.Application.Exceptions;
 using BusinessTrackerApp.Application.Repositories.Department;
 using BusinessTrackerApp.Application.ViewModels.Department;
 using BusinessTrackerApp.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace BusinessTrackerApp.Persistence.Services
 {
@@ -13,31 +15,52 @@ namespace BusinessTrackerApp.Persistence.Services
 	{
 		private readonly IDepartmentWriteRepository _departmentWriteRepository;
         private readonly IDepartmentReadRepository _departmentReadRepository;
-        private readonly UserManager<Employee> _userManager;
+        private readonly IEmployeeService _employeeService;
 
-        public DepartmentService(IDepartmentWriteRepository departmentWriteRepository, IDepartmentReadRepository departmentReadRepository, UserManager<Employee> userManager)
+        private readonly IMapper _mapper;
+
+        public DepartmentService(IDepartmentWriteRepository departmentWriteRepository, IDepartmentReadRepository departmentReadRepository,  IMapper mapper, IEmployeeService employeeService)
         {
             _departmentWriteRepository = departmentWriteRepository;
             _departmentReadRepository = departmentReadRepository;
-            _userManager = userManager;
+            _mapper = mapper;
+            _employeeService = employeeService;
         }
 
 
-        public IEnumerable<Department> FindAll()
+        public IEnumerable<DepartmentResponseVM> FindAll()
         {
-            return _departmentReadRepository.FindAll();
+            var departmens = _departmentReadRepository.FindAll();
+            return _mapper.Map<IEnumerable<DepartmentResponseVM>>(departmens);
         }
 
-        private async Task<Department> GetDepartmentByIdAndCheckExist(string id)
+        private async Task<Department> GetDepartmentByNameAndCheckExist(string name)
         {
-            Department? department = await _departmentReadRepository.FindByIdAsync(id);
+            Department? department = await _departmentReadRepository.Table
+                .Include(d => d.Manager)
+                .Where(d => d.Name == name)
+                .FirstOrDefaultAsync();
 
-            return department ?? throw new DepartmentNotFoundException(id);
+            return department ?? throw new DepartmentNotFoundException(name);
+
         }
 
-        public async Task<Department> FindByIdAsync(string id)
-        {
-            return await GetDepartmentByIdAndCheckExist(id);
+        public async Task<DepartmentResponseVM> FindByNameAsync(string name)
+        { 
+            Department department = await GetDepartmentByNameAndCheckExist(name);
+
+            DepartmentResponseVM response = new DepartmentResponseVM
+            {
+                Id = department.Id.ToString(),
+                Name = department.Name    
+            };
+
+            if (department.Manager is not null)
+               response.Manager = _mapper.Map<EmployeeDto>(department.Manager);
+
+
+            return response;
+
         }
 
         public async Task CreateDepartmentAsync(CreateDepartmentRequestVM createDepartmentRequest)
@@ -54,8 +77,8 @@ namespace BusinessTrackerApp.Persistence.Services
 
             if (!string.IsNullOrWhiteSpace(createDepartmentRequest.ManagerUserName))
             {
-                Employee? employee = await _userManager.FindByNameAsync(createDepartmentRequest.ManagerUserName);
-                department.Manager = employee;
+                EmployeeDto employeeDto = await _employeeService.GetEmployeeByUsernameAsync(createDepartmentRequest.ManagerUserName);
+                department.ManagerId = employeeDto.Id;
             }
 
             await _departmentWriteRepository.AddAsync(department);
@@ -64,16 +87,15 @@ namespace BusinessTrackerApp.Persistence.Services
 
         public async Task UpdateDepartmentAsync(UpdateDepartmentRequestVM updateDepartmentRequest)
         {
-            Department department = await GetDepartmentByIdAndCheckExist(updateDepartmentRequest.Id);
+            Department department = await GetDepartmentByNameAndCheckExist(updateDepartmentRequest.Name);
 
             department.Name = updateDepartmentRequest.Name;
 
             if (!string.IsNullOrWhiteSpace(updateDepartmentRequest.ManagerUserName))
             {
-                Employee? employee = await _userManager.FindByNameAsync(updateDepartmentRequest.ManagerUserName);
+                var employeeDto = await _employeeService.GetEmployeeByUsernameAsync(updateDepartmentRequest.ManagerUserName);
 
-                if(employee is not null)
-                    department.Manager = employee;
+                department.ManagerId = employeeDto.Id;
             }
             else
             {
