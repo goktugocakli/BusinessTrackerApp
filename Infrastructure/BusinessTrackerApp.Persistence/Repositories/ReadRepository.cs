@@ -36,7 +36,7 @@ namespace BusinessTrackerApp.Persistence.Repositories
 
         public async Task<T?> FindByIdAsync(string id)
         {
-            return await Table.FindAsync(Guid.Parse(id));
+            return await Table.FindAsync(id);
             
         }
 

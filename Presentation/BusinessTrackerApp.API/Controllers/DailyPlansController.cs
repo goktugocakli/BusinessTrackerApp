@@ -1,4 +1,5 @@
-﻿using BusinessTrackerApp.Application.Abstractions.Services;
+﻿using System.Text.Json;
+using BusinessTrackerApp.Application.Abstractions.Services;
 using BusinessTrackerApp.Application.RequestParameters;
 using BusinessTrackerApp.Application.ViewModels.DailyPlan;
 using Microsoft.AspNetCore.Authorization;
@@ -24,22 +25,24 @@ namespace BusinessTrackerApp.API.Controllers
         [HttpGet]
         public IActionResult GetAll([FromQuery] DailyPlanParameters parameters)
         {
-            var response = _dailyPlanService.FindAll(parameters);
-            return Ok(response);
+            var pagedResult = _dailyPlanService.FindAll(parameters);
+
+            Response.Headers.Add("X_Pagination", JsonSerializer.Serialize(pagedResult.metaData));
+            return Ok(pagedResult.dailyPlans);
         }
         
 
         
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         [Authorize(Roles = "Employee, Admin")]
-        public async Task<IActionResult> GetById([FromRoute]string id)
+        public async Task<IActionResult> GetById([FromRoute]int id)
         {
             return Ok(await _dailyPlanService.FindByIdAsync(id));
         }
 
         
         [HttpPost]
-        [Authorize(Roles = "Employee")]
+        [Authorize(Roles = "Employee, Admin")]
         public async Task<IActionResult> CreateDailyPlan([FromBody]CreateDailyPlanRequestVM dailyPlanRequest)
         {
             await _dailyPlanService.CreateDaiyPlanAsync(dailyPlanRequest);
@@ -50,16 +53,16 @@ namespace BusinessTrackerApp.API.Controllers
 
         
         [HttpPut]
-        [Authorize(Roles = "Employee")]
+        [Authorize(Roles = "Employee, Admin")]
         public async Task<IActionResult> UpdateDailyPlan([FromBody] UpdateDailyPlanRequestVM dailyPlanRequest)
         {
             await _dailyPlanService.UpdateDailyPlanAsync(dailyPlanRequest);
             return Ok();
         }
 
-        [HttpDelete("{id}")]
-        [Authorize(Roles = "Employee")]
-        public async Task<IActionResult> DeleteAsync([FromRoute]string id)
+        [HttpDelete("{id:int}")]
+        [Authorize(Roles = "Employee, Admin")]
+        public async Task<IActionResult> DeleteAsync([FromRoute]int id)
         {
             await _dailyPlanService.DeleteByIdAsync(id);
             return Ok();

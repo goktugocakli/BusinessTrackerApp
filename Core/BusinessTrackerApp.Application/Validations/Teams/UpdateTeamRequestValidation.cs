@@ -10,8 +10,8 @@ namespace BusinessTrackerApp.Application.Validations.Teams
 		{
             RuleFor(t => t.Id)
                 .NotEmpty()
-                .NotNull()
-                .Matches(ValidationConstants.GuidRegex);
+                .NotNull();
+                
 
             RuleFor(t => t.Name)
                 .NotEmpty()

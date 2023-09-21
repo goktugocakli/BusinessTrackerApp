@@ -31,16 +31,12 @@ namespace BusinessTrackerApp.Application.Validations.Employees
 					.WithMessage("Lütfen çalışan telefonu alanını boş bırakmayınız.")
 				.Matches(ValidationConstants.PhoneRegex)
 					.WithMessage("Geçerli bir telefon numarası giriniz.");
+
 			RuleFor(e => e.DepartmentId)
 				.NotEmpty()
 				.NotNull()
-					.WithMessage("Departman Id alanını boş bırakmayınız.")
-				.Matches(ValidationConstants.GuidRegex)
-					.WithMessage("Geçerli bir departman id giriniz. Departman Id alanı Guid yapısında olmalıdır.");
-
-			RuleFor(e => e.TeamId)
-				.Matches(ValidationConstants.GuidRegex)
-					.WithMessage("Geçerli bir TeamId giriniz ya da boş bırakınız. Team Id alanı Guid yapısında olmalıdır.");			
+					.WithMessage("Departman Id alanını boş bırakmayınız.");
+			
 
 		}
 	}

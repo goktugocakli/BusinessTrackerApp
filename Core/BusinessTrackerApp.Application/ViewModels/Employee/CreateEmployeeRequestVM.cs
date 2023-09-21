@@ -8,9 +8,9 @@ namespace BusinessTrackerApp.Application.ViewModels.Employee
         public string Password { get; init; }
         public required string Mail { get; init; }
         public required string Phone { get; init; }
-        public required string DepartmentId { get; init; }
+        public required int DepartmentId { get; init; }
         public ICollection<string> Roles { get; init; }
-        public string? TeamId{ get; set; }
+        public int? TeamId{ get; set; }
 
     }
 }

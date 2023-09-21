@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BusinessTrackerApp.Persistence.Services
 {
-	public class TeamService : ITeamService
-	{
+    public class TeamService : ITeamService
+    {
         readonly ITeamReadRepository _teamReadRepository;
         readonly ITeamWriteRepository _teamWriteRepository;
         readonly IDepartmentService _departmentService;
@@ -32,7 +32,7 @@ namespace BusinessTrackerApp.Persistence.Services
         {
             string? leaderId = null;
 
-            var departmentDto = await _departmentService.FindByNameAsync(teamRequestVM.DepartmentName);
+            var departmentDto = await _departmentService.FindByNameOrIdAsync(teamRequestVM.DepartmentName);
 
             if (!string.IsNullOrWhiteSpace(teamRequestVM.LeaderUsername))
             {
@@ -43,7 +43,7 @@ namespace BusinessTrackerApp.Persistence.Services
             Team team = new()
             {
                 Name = teamRequestVM.Name,
-                DepartmentId = Guid.Parse(departmentDto.Id),
+                DepartmentId = departmentDto.Id,
                 LeaderId = leaderId
             };
 
@@ -63,38 +63,30 @@ namespace BusinessTrackerApp.Persistence.Services
             }
         }
 
-        public  IEnumerable<Team> FindAll()
+        public IEnumerable<TeamDto> FindAll()
         {
-            var teams = _teamReadRepository.FindAll();
-            return teams;
+            var teams = _teamReadRepository.Table
+                .Include(team => team.Leader)
+                .Include(team => team.Department);
+            return _mapper.Map<IEnumerable<TeamDto>>(teams);
         }
 
-        private async Task<Team> GetTeamByIdAndCheckExist(string id)
+        private async Task<Team> GetTeamByIdAndCheckExist(int id)
         {
-            if(Guid.TryParse(id, out var guidResult))
-            {
-                Team? team = await _teamReadRepository.Table
-                    .Include(t => t.Department)
-                    .Include(t => t.Leader)
-                    .FirstOrDefaultAsync(e => e.Id == guidResult);
+            Team? team = await _teamReadRepository.Table
+                .Include(t => t.Department)
+                .Include(t => t.Leader)
+                .FirstOrDefaultAsync(e => e.Id == id);
 
-                return team ?? throw new NotFoundException(id);
-            }
 
-            throw new TeamNotFoundException(id) ;
+            return team ?? throw new TeamNotFoundException(id.ToString());
         }
 
-        public async Task<TeamDto> GetByIdAsync(string id)
+        public async Task<TeamDto> GetByIdAsync(int id)
         {
             Team team = await GetTeamByIdAndCheckExist(id);
 
-            return new TeamDto()
-            {
-                Id = team.Id.ToString(),
-                Name = team.Name,
-                DepartmentName = team.Department.Name,
-                Leader = _mapper.Map<EmployeeDto>(team.Leader)
-            };
+            return _mapper.Map<TeamDto>(team);
 
         }
 
@@ -102,7 +94,7 @@ namespace BusinessTrackerApp.Persistence.Services
         {
             Team team = await GetTeamByIdAndCheckExist(teamRequestVM.Id);
 
-            var departmentDto = await _departmentService.FindByNameAsync(teamRequestVM.DepartmentName);
+            var departmentDto = await _departmentService.FindByNameOrIdAsync(teamRequestVM.DepartmentName);
 
             if (teamRequestVM.LeaderUsername is not null)
             {
@@ -115,13 +107,13 @@ namespace BusinessTrackerApp.Persistence.Services
             }
 
             team.Name = teamRequestVM.Name;
-            team.DepartmentId = Guid.Parse(departmentDto.Id);
+            team.DepartmentId = departmentDto.Id;
 
             _teamWriteRepository.Update(team);
             await _teamWriteRepository.SaveAsync();
         }
 
-        public async Task DeleteTeamAsync(string id)
+        public async Task DeleteByIdAsync(int id)
         {
             Team team = await GetTeamByIdAndCheckExist(id);
 
@@ -133,9 +125,9 @@ namespace BusinessTrackerApp.Persistence.Services
         public async Task ManipulateEmployeesAsync(ManipulateEmployeesIntoTeamRequest request)
         {
             Team team = await GetTeamByIdAndCheckExist(request.TeamId);
-            
 
-            foreach(var employeeItem  in request.employeeUsernames)
+
+            foreach (var employeeItem in request.employeeUsernames)
             {
                 Employee employee = await _employeeService.GetEmployeeByUsernameAndCheckExist(employeeItem.Username);
 

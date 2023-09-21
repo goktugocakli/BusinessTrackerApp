@@ -23,7 +23,11 @@ namespace BusinessTrackerApp.Persistence.Context
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyConfiguration(new RoleConfiguration());
-            
+
+            modelBuilder.Entity<Employee>()
+                .HasIndex(e => e.UserName)
+                .IsUnique();
+                
 
             modelBuilder.Entity<Department>()
                 .HasIndex(d => d.Name)

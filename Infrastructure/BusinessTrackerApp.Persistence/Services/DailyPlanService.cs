@@ -8,6 +8,7 @@ using BusinessTrackerApp.Application.ViewModels.DailyPlan;
 using BusinessTrackerApp.Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace BusinessTrackerApp.Persistence.Services
 {
@@ -29,25 +30,38 @@ namespace BusinessTrackerApp.Persistence.Services
             _http = http;
         }
 
-        public IEnumerable<DailyPlanDto> FindAll(DailyPlanParameters parameters)
+        public (IEnumerable<DailyPlanDto>, MetaData) FindAll(DailyPlanParameters parameters)
         {
-            var response = _dailyPlanReadRepository.FindAll(parameters, false);
 
-            return _mapper.Map<IEnumerable<DailyPlanDto>>(response);
-            
+            var dailyPlansWithMetaData = _dailyPlanReadRepository.FindAll(parameters, false);
+
+            var dailyPlansDto = _mapper.Map<IEnumerable<DailyPlanDto>>(dailyPlansWithMetaData);
+
+            return (dailyPlansDto, dailyPlansWithMetaData.MetaData);
         }
 
-        public async Task<DailyPlanDto> FindByIdAsync(string id)
+        public async Task<DailyPlanDto> FindByIdAsync(int id)
         {
+            var user = _http.HttpContext?.User;
+
             var dailyPlan = await GetByIdAndCheckExistAsync(id);
+
+            /*
+            if (user.Identity.Name != dailyPlan.Employee.UserName)
+                throw new UnauthorizedAccessException("günlük plan size ait değil");
+
+            */
             return _mapper.Map<DailyPlanDto>(dailyPlan);
         }
 
-        private async Task<DailyPlan> GetByIdAndCheckExistAsync(string id)
+        private async Task<DailyPlan> GetByIdAndCheckExistAsync(int id)
         {
-            DailyPlan? dailyPlan = await _dailyPlanReadRepository.FindByIdAsync(id);
+            DailyPlan? dailyPlan = await _dailyPlanReadRepository.Table
+                .Include(d => d.Employee)
+                .ThenInclude(e => e.Department)
+                .FirstOrDefaultAsync(d => d.Id == id);
 
-            return dailyPlan ?? throw new DailyPlanNotFoundException(id);    
+            return dailyPlan ?? throw new DailyPlanNotFoundException(id.ToString());    
         }
 
         public async Task  CreateDaiyPlanAsync(CreateDailyPlanRequestVM createDailyPlanRequest)
@@ -73,6 +87,11 @@ namespace BusinessTrackerApp.Persistence.Services
         {
             DailyPlan dailyPlan = await GetByIdAndCheckExistAsync(updateDailyPlanRequest.Id);
 
+            string? username = _http.HttpContext?.User.Identity?.Name;
+
+            if (dailyPlan.Employee.UserName != username)
+                throw new UnauthorizedAccessException("Başka bir kullanıcının günlüğünü değiştirmeye yetkiniz yok.");
+
             dailyPlan.Header = updateDailyPlanRequest.Header;
             dailyPlan.Description = updateDailyPlanRequest.Description;
             dailyPlan.Date = updateDailyPlanRequest.Date;
@@ -83,12 +102,32 @@ namespace BusinessTrackerApp.Persistence.Services
             await _dailyPlanWriteRepository.SaveAsync();
         }
 
-        public async Task DeleteByIdAsync(string id)
-        {
+        public async Task DeleteByIdAsync(int id)
+        { 
             DailyPlan dailyPlan = await GetByIdAndCheckExistAsync(id);
+
+            string? username = _http.HttpContext?.User.Identity?.Name;
+
+            if (dailyPlan.Employee.UserName != username)
+                throw new UnauthorizedAccessException("Başka bir kullanıcının günlüğünü değiştirmeye yetkiniz yok.");
 
             _dailyPlanWriteRepository.Remove(dailyPlan);
             await _dailyPlanWriteRepository.SaveAsync();
+        }
+
+
+        private async Task<bool> IsDepartmentManager(string department, string username)
+        {
+            Employee? departmentManager = await _userManager.Users
+               .Include(u => u.Department)
+               .ThenInclude(d => d.Manager)
+               .Where(u => u.Department.Manager.UserName == username && u.Department.Name == department)
+               .FirstOrDefaultAsync();
+
+            if (departmentManager is null)
+                return false;
+
+            return true;
         }
     }
 }

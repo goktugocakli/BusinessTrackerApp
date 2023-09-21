@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BusinessTrackerApp.Persistence.Migrations
 {
     [DbContext(typeof(BusinessTrackerDbContext))]
-    [Migration("20230914103721_EmployeIdentityUser3")]
-    partial class EmployeIdentityUser3
+    [Migration("20230915215602_new_mig_2")]
+    partial class new_mig_2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,9 +27,11 @@ namespace BusinessTrackerApp.Persistence.Migrations
 
             modelBuilder.Entity("BusinessTrackerApp.Domain.Entities.DailyPlan", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp with time zone");
@@ -68,9 +70,11 @@ namespace BusinessTrackerApp.Persistence.Migrations
 
             modelBuilder.Entity("BusinessTrackerApp.Domain.Entities.Department", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp with time zone");
@@ -108,8 +112,8 @@ namespace BusinessTrackerApp.Persistence.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("DepartmentId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("DepartmentId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
@@ -148,8 +152,8 @@ namespace BusinessTrackerApp.Persistence.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("text");
 
-                    b.Property<Guid?>("TeamId")
-                        .HasColumnType("uuid");
+                    b.Property<int?>("TeamId")
+                        .HasColumnType("integer");
 
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("boolean");
@@ -171,20 +175,25 @@ namespace BusinessTrackerApp.Persistence.Migrations
 
                     b.HasIndex("TeamId");
 
+                    b.HasIndex("UserName")
+                        .IsUnique();
+
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
             modelBuilder.Entity("BusinessTrackerApp.Domain.Entities.Team", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("DepartmentId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("DepartmentId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("LeaderId")
                         .HasColumnType("text");
@@ -234,25 +243,25 @@ namespace BusinessTrackerApp.Persistence.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "967a1e3e-2622-415d-ab5e-873604ed73ec",
+                            Id = "28adc6c2-99de-40bb-bd85-c983be020b1a",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "218e0d76-8240-410c-bdf3-40e8d8c4303e",
+                            Id = "72fdb710-543f-4f37-9031-2351d2359b4c",
                             Name = "Department Manager",
                             NormalizedName = "DEPARTMENT MANAGER"
                         },
                         new
                         {
-                            Id = "6024c314-2dc1-4021-8bce-7aa7816a3149",
+                            Id = "e0687a77-8f78-459e-acb6-ba68a8f72300",
                             Name = "Team Leader",
                             NormalizedName = "TEAM LEADER"
                         },
                         new
                         {
-                            Id = "b38f9fe3-9835-4c3e-8475-1f8a84d1c9e8",
+                            Id = "1423b4af-662b-4376-932c-70d8522a31ce",
                             Name = "Employee",
                             NormalizedName = "EMPLOYEE"
                         });

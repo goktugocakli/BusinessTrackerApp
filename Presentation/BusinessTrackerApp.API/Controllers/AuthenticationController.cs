@@ -1,6 +1,6 @@
 ﻿using System;
 using BusinessTrackerApp.Application.Abstractions.Services;
-using BusinessTrackerApp.Application.ViewModels;
+using BusinessTrackerApp.Application.ViewModels.Employee;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BusinessTrackerApp.API.Controllers

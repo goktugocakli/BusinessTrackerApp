@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq.Expressions;
+using BusinessTrackerApp.Application.Exceptions;
 using BusinessTrackerApp.Application.Repositories.Department;
 using BusinessTrackerApp.Domain.Entities;
 using BusinessTrackerApp.Persistence.Context;
@@ -13,7 +14,6 @@ namespace BusinessTrackerApp.Persistence.Repositories
         {
         }
 
-        
     }
 }
 

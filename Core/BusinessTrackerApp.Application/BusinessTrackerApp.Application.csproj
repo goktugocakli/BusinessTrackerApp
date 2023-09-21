@@ -31,8 +31,8 @@
     <None Remove="Exceptions\" />
     <None Remove="DTOs\Team\" />
     <None Remove="Exceptions\NotFoundExceptions\" />
-    <None Remove="Exceptions\ConflictException\" />
     <None Remove="DTOs\Department\" />
+    <None Remove="Exceptions\ConflictExceptions\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Repositories\" />
@@ -59,8 +59,8 @@
     <Folder Include="Exceptions\" />
     <Folder Include="DTOs\Team\" />
     <Folder Include="Exceptions\NotFoundExceptions\" />
-    <Folder Include="Exceptions\ConflictException\" />
     <Folder Include="DTOs\Department\" />
+    <Folder Include="Exceptions\ConflictExceptions\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.11" />

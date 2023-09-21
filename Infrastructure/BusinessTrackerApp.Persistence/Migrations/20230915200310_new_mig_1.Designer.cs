@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BusinessTrackerApp.Persistence.Migrations
 {
     [DbContext(typeof(BusinessTrackerDbContext))]
-    [Migration("20230913080129_CreatingIdentityTables")]
-    partial class CreatingIdentityTables
+    [Migration("20230915200310_new_mig_1")]
+    partial class new_mig_1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,9 +27,11 @@ namespace BusinessTrackerApp.Persistence.Migrations
 
             modelBuilder.Entity("BusinessTrackerApp.Domain.Entities.DailyPlan", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp with time zone");
@@ -41,8 +43,9 @@ namespace BusinessTrackerApp.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("EmployeeId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("EmployeeId")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("Header")
                         .IsRequired()
@@ -67,15 +70,17 @@ namespace BusinessTrackerApp.Persistence.Migrations
 
             modelBuilder.Entity("BusinessTrackerApp.Domain.Entities.Department", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid?>("ManagerId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("ManagerId")
+                        .HasColumnType("text");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -97,83 +102,6 @@ namespace BusinessTrackerApp.Persistence.Migrations
 
             modelBuilder.Entity("BusinessTrackerApp.Domain.Entities.Employee", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("DepartmentId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Mail")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Phone")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<Guid?>("TeamId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("UpdatedDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DepartmentId");
-
-                    b.HasIndex("Mail")
-                        .IsUnique();
-
-                    b.HasIndex("Phone")
-                        .IsUnique();
-
-                    b.HasIndex("TeamId");
-
-                    b.ToTable("Employees");
-                });
-
-            modelBuilder.Entity("BusinessTrackerApp.Domain.Entities.Team", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("DepartmentId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("LeaderId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("UpdatedDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DepartmentId");
-
-                    b.HasIndex("LeaderId")
-                        .IsUnique();
-
-                    b.ToTable("Teams");
-                });
-
-            modelBuilder.Entity("BusinessTrackerApp.Domain.Entities.User", b =>
-                {
                     b.Property<string>("Id")
                         .HasColumnType("text");
 
@@ -184,6 +112,9 @@ namespace BusinessTrackerApp.Persistence.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("text");
 
+                    b.Property<int>("DepartmentId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
@@ -191,17 +122,15 @@ namespace BusinessTrackerApp.Persistence.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("FirstName")
-                        .HasColumnType("text");
-
-                    b.Property<string>("LastName")
-                        .HasColumnType("text");
-
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("boolean");
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("NameSurname")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -223,6 +152,9 @@ namespace BusinessTrackerApp.Persistence.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("text");
 
+                    b.Property<int?>("TeamId")
+                        .HasColumnType("integer");
+
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("boolean");
 
@@ -232,6 +164,8 @@ namespace BusinessTrackerApp.Persistence.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("DepartmentId");
+
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
@@ -239,7 +173,43 @@ namespace BusinessTrackerApp.Persistence.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex");
 
+                    b.HasIndex("TeamId");
+
                     b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("BusinessTrackerApp.Domain.Entities.Team", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("DepartmentId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("LeaderId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DepartmentId");
+
+                    b.HasIndex("LeaderId")
+                        .IsUnique();
+
+                    b.ToTable("Teams");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -266,6 +236,32 @@ namespace BusinessTrackerApp.Persistence.Migrations
                         .HasDatabaseName("RoleNameIndex");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "342599ac-5994-4922-80a1-3ac7a8337d86",
+                            Name = "Admin",
+                            NormalizedName = "ADMIN"
+                        },
+                        new
+                        {
+                            Id = "8e6a391e-fbe3-4e8c-a7e4-80defeeb7d2e",
+                            Name = "Department Manager",
+                            NormalizedName = "DEPARTMENT MANAGER"
+                        },
+                        new
+                        {
+                            Id = "45918b11-3bc4-45eb-a8f1-bce24c82cc5b",
+                            Name = "Team Leader",
+                            NormalizedName = "TEAM LEADER"
+                        },
+                        new
+                        {
+                            Id = "8cb26264-ce6c-40c0-a544-d1624403c310",
+                            Name = "Employee",
+                            NormalizedName = "EMPLOYEE"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -439,7 +435,7 @@ namespace BusinessTrackerApp.Persistence.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("BusinessTrackerApp.Domain.Entities.User", null)
+                    b.HasOne("BusinessTrackerApp.Domain.Entities.Employee", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -448,7 +444,7 @@ namespace BusinessTrackerApp.Persistence.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("BusinessTrackerApp.Domain.Entities.User", null)
+                    b.HasOne("BusinessTrackerApp.Domain.Entities.Employee", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -463,7 +459,7 @@ namespace BusinessTrackerApp.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BusinessTrackerApp.Domain.Entities.User", null)
+                    b.HasOne("BusinessTrackerApp.Domain.Entities.Employee", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -472,7 +468,7 @@ namespace BusinessTrackerApp.Persistence.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("BusinessTrackerApp.Domain.Entities.User", null)
+                    b.HasOne("BusinessTrackerApp.Domain.Entities.Employee", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)

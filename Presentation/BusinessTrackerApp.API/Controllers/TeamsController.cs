@@ -23,23 +23,23 @@ namespace BusinessTrackerApp.API.Controllers
 
 
         [HttpGet]
-        //[Authorize]
+        [Authorize]
         public IActionResult GetAllTeams()
         {
             return Ok(_teamService.FindAll());
         }
 
         
-        [HttpGet("{id}")]
-        //[Authorize]
-        public async Task<IActionResult> GetTeamById([FromRoute]string id)
+        [HttpGet("{id:int}")]
+        [Authorize]
+        public async Task<IActionResult> GetTeamById([FromRoute]int id)
         {
             return Ok(await _teamService.GetByIdAsync(id));
         }
 
         
         [HttpPost]
-        //[Authorize(Roles ="Admin")]
+        [Authorize(Roles ="Admin")]
         public async Task<IActionResult> CreateTeam([FromBody] CreateTeamRequestVM teamRequestVM)
         {
             await _teamService.CreateTeamAsync(teamRequestVM);
@@ -49,7 +49,7 @@ namespace BusinessTrackerApp.API.Controllers
 
         
         [HttpPut]
-        //[Authorize(Roles ="Admin")]
+        [Authorize(Roles ="Admin")]
         public async Task<IActionResult> UpdateTeam([FromBody] UpdateTeamRequestVM teamRequestVM)
         {
             await _teamService.UpdateTeamAsync(teamRequestVM);
@@ -57,12 +57,12 @@ namespace BusinessTrackerApp.API.Controllers
             return Ok();
         }
 
-        // DELETE api/values/5
-        [HttpDelete("{id}")]
-        //[Authorize(Roles ="Admin")]
-        public async Task<IActionResult> DeleteTeamById([FromRoute]string id)
+        
+        [HttpDelete("{id:int}")]
+        [Authorize(Roles ="Admin")]
+        public async Task<IActionResult> DeleteTeamById([FromRoute]int id)
         {
-            await _teamService.DeleteTeamAsync(id);
+            await _teamService.DeleteByIdAsync(id);
             return Ok();
         }
 

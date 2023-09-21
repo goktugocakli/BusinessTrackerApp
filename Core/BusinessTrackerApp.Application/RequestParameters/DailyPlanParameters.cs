@@ -8,7 +8,7 @@ namespace BusinessTrackerApp.Application.RequestParameters
 
 		public bool ValidTimeRange => EndTime > StartTime;
 
-		public string? EmployeeUserName { get; set; }
+		public string? EmployeeUserName { get; set; } 
 
 		public string? DepartmentName { get; set; }
 

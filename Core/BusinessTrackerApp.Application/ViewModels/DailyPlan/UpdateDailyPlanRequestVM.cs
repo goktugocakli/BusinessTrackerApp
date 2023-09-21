@@ -5,7 +5,7 @@ namespace BusinessTrackerApp.Application.ViewModels.DailyPlan
 {
 	public record UpdateDailyPlanRequestVM
 	{
-        public string Id { get; set; }
+        public int Id { get; set; }
         public string Header { get; init; }
         public string Description { get; init; }
         public DateOnly Date { get; init; }

@@ -11,8 +11,8 @@ namespace BusinessTrackerApp.Application.Validations.Teams
 
 			RuleFor(r => r.TeamId)
 				.NotEmpty()
-                .NotNull()
-                .Matches(ValidationConstants.GuidRegex);
+				.NotNull();
+                
 
 			RuleForEach(r => r.employeeUsernames)
 				.ChildRules(ManipulateStruct =>

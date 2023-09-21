@@ -5,9 +5,9 @@ namespace BusinessTrackerApp.Application.DTOs.Department
 {
 	public record DepartmentDto
 	{
-        public string Id { get; init; }
+        public int Id { get; init; }
         public string Name { get; init; }
-        public EmployeeDto Manager { get; init; }
+        public EmployeeDto? Manager { get; init; }
     }
 }
 

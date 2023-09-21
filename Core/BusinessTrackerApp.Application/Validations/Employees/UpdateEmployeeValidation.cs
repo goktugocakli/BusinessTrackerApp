@@ -15,7 +15,7 @@ namespace BusinessTrackerApp.Application.Validations.Employees
                 .Matches(ValidationConstants.GuidRegex)
                     .WithMessage("Lütfen geçerli bir Id giriniz. Id alanı Guid yapısında olmalıdır.");
 
-            RuleFor(e => e.Name)
+            RuleFor(e => e.NameSurname)
                 .NotEmpty()
                 .NotNull()
                     .WithMessage("Lütfen çalışan adını boş bırakmayınız.");
@@ -37,13 +37,9 @@ namespace BusinessTrackerApp.Application.Validations.Employees
             RuleFor(e => e.DepartmentId)
                 .NotEmpty()
                 .NotNull()
-                    .WithMessage("Departman Id alanını boş bırakmayınız.")
-                .Matches(ValidationConstants.GuidRegex)
-                    .WithMessage("Geçerli bir departman id giriniz. Departman Id alanı Guid yapısında olmalıdır.");
+                    .WithMessage("Departman Id alanını boş bırakmayınız.");
 
-            RuleFor(e => e.TeamId)
-                .Matches(ValidationConstants.GuidRegex)
-                    .WithMessage("Geçerli bir TeamId giriniz ya da boş bırakınız. Team Id alanı Guid yapısında olmalıdır.");
+            
         }
     }
 }

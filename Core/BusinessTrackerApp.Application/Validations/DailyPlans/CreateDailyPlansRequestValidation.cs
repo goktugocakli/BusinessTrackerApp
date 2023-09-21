@@ -12,7 +12,6 @@ namespace BusinessTrackerApp.Application.Validations.DailyPlans
 				.NotEmpty()
 				.NotNull()
 					.WithMessage("Header alanını boş bırakmayınız.");
-			
 
 			RuleFor(p => p.Description)
 				.NotEmpty()

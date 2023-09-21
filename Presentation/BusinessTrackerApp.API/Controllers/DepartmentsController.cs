@@ -30,26 +30,25 @@ namespace BusinessTrackerApp.API.Controllers
         }
 
        
-        [HttpGet("{name}")]
-        //[Authorize]
-        public async Task<IActionResult> GetByName([FromRoute] string name)
+        [HttpGet("{nameOrId}")]
+        [Authorize]
+        public async Task<IActionResult> GetDepartmentByNameOrId([FromRoute] string nameOrId)
         {
-            return Ok(await _departmentService.FindByNameAsync(name));
+            return Ok(await _departmentService.FindByNameOrIdAsync(nameOrId));
         }
 
-        // POST api/values
         [HttpPost]
-        //[Authorize(Roles ="Admin")]
-        public async Task<IActionResult> Post([FromBody] CreateDepartmentRequestVM createDepartmentRequest)
+        [Authorize(Roles ="Admin")]
+        public async Task<IActionResult> CreateDepartment([FromBody] CreateDepartmentRequestVM createDepartmentRequest)
         {
-             await _departmentService.CreateDepartmentAsync(createDepartmentRequest);
-            return Ok();
+             var response = await _departmentService.CreateDepartmentAsync(createDepartmentRequest);
+            return StatusCode(201, response);
         }
 
 
         [HttpPut]
-        //[Authorize(Roles ="Admin")]
-        public async Task<IActionResult> Put([FromBody] UpdateDepartmentRequestVM updateDepartmentRequest)
+        [Authorize(Roles ="Admin")]
+        public async Task<IActionResult> UpdateDepartment([FromBody] UpdateDepartmentRequestVM updateDepartmentRequest)
         {
             await _departmentService.UpdateDepartmentAsync(updateDepartmentRequest);
             return Ok();
@@ -58,7 +57,7 @@ namespace BusinessTrackerApp.API.Controllers
         // DELETE api/values/5
         [HttpDelete("{idOrName}")]
         [Authorize(Roles ="Admin")]
-        public async Task<IActionResult> Delete([FromRoute] string idOrName)
+        public async Task<IActionResult> DeleteDepartmentByIdOrName([FromRoute] string idOrName)
         {
             await _departmentService.DeleteDepartmentAsync(idOrName);
             return Ok();

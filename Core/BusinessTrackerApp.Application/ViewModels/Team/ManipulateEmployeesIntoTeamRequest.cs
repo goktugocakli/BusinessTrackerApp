@@ -3,7 +3,7 @@ namespace BusinessTrackerApp.Application.ViewModels.Team
 {
 	public record ManipulateEmployeesIntoTeamRequest
 	{
-		public string TeamId { get; init; }
+		public int TeamId { get; init; }
 		public required ICollection<ManipulateStruct> employeeUsernames { get; init; } = new HashSet<ManipulateStruct>();
 
 	}

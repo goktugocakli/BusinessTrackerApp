@@ -6,7 +6,7 @@
 
         public string? TeamName { get; set; }
 
-        public string? TeamId { get; set; }
+        public int? TeamId { get; set; }
 
         public EmployeeParameters()
         {

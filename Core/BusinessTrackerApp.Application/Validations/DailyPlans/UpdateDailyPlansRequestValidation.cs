@@ -9,7 +9,8 @@ namespace BusinessTrackerApp.Application.Validations.DailyPlans
 		public UpdateDailyPlansRequestValidation()
 		{
             RuleFor(p => p.Id)
-                .Matches(ValidationConstants.GuidRegex);
+                .NotEmpty()
+                .NotNull();
 
             RuleFor(p => p.Header)
                 .NotEmpty()

@@ -13,13 +13,13 @@ namespace BusinessTrackerApp.Application.Abstractions.Services
 
 		Task UpdateTeamAsync(UpdateTeamRequestVM teamRequestVM);
 
-		IEnumerable<Team> FindAll();
+		IEnumerable<TeamDto> FindAll();
 
 		//Task<Team> GetTeamByIdAndCheckExist(string id);
 
-		Task<TeamDto> GetByIdAsync(string id);
+		Task<TeamDto> GetByIdAsync(int id);
 
-		Task DeleteTeamAsync(string id);
+		Task DeleteByIdAsync(int id);
     }
 }
 

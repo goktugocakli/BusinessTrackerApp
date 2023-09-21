@@ -30,6 +30,7 @@ namespace BusinessTrackerApp.Persistence
 				opts.Password.RequiredLength = 3;
 
 				opts.User.RequireUniqueEmail = true;
+				
 			})
 				.AddEntityFrameworkStores<BusinessTrackerDbContext>()
 				.AddDefaultTokenProviders();

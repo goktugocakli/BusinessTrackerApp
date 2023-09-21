@@ -10,18 +10,22 @@ using Microsoft.AspNetCore.Identity;
 using BusinessTrackerApp.Persistence.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using BusinessTrackerApp.Application.Repositories.Department;
+using BusinessTrackerApp.Application.Exceptions.ConflictExceptions;
 
 namespace BusinessTrackerApp.Persistence.Services
 {
-	public class EmployeeService : IEmployeeService
-	{
+    public class EmployeeService : IEmployeeService
+    {
         readonly UserManager<Employee> _userManager;
+        readonly IDepartmentReadRepository _departmentReadRepository;
         readonly IMapper _mapper;
 
-        public EmployeeService(IMapper mapper, UserManager<Employee> userManager)
+        public EmployeeService(IMapper mapper, UserManager<Employee> userManager, IDepartmentReadRepository departmentReadRepository)
         {
             _mapper = mapper;
             _userManager = userManager;
+            _departmentReadRepository = departmentReadRepository;
         }
 
         public (IEnumerable<EmployeeDto> employeeDtos, MetaData metaData) GetAllEmployees(EmployeeParameters parameters)
@@ -42,29 +46,41 @@ namespace BusinessTrackerApp.Persistence.Services
             return employee ?? throw new EmployeeNotFoundException(username);
         }
 
+        private async Task<Employee> GetEmployeeByIdAndCheckExist(string id)
+        {
+            Employee? employee = await _userManager.FindByIdAsync(id);
+            return employee ?? throw new EmployeeNotFoundException(id);
+        }
         public async Task<EmployeeDto> GetEmployeeByUsernameAsync(string username)
         {
             Employee employee = await GetEmployeeByUsernameAndCheckExist(username);
-            
+
             return _mapper.Map<EmployeeDto>(employee);
         }
 
 
         public async Task<EmployeeDto> CreateEmployeeAsync(CreateEmployeeRequestVM model)
         {
+            var department = await _departmentReadRepository.FindByIdAsync(model.DepartmentId) ?? throw new DepartmentNotFoundException(model.DepartmentId.ToString());
 
-            Employee employee = new()
+            Employee? employee = await _userManager.FindByNameAsync(model.Username);
+
+            if (employee is not null)
+                throw new EmployeeUsernameAlreadyExistException(model.Username);
+
+            employee = new()
             {
                 NameSurname = model.NameSurname,
                 UserName = model.Username,
                 Email = model.Mail,
                 PhoneNumber = model.Phone,
-                DepartmentId = Guid.Parse(model.DepartmentId)
+                Department = department
             };
 
             if (model.TeamId is not null)
-                employee.TeamId = Guid.Parse(model.TeamId);
+                employee.TeamId = model.TeamId;
 
+            
             IdentityResult result = await _userManager.CreateAsync(employee, model.Password);
             if (result.Succeeded)
                 await _userManager.AddToRolesAsync(employee, model.Roles);
@@ -75,16 +91,18 @@ namespace BusinessTrackerApp.Persistence.Services
 
         public async Task UpdateEmployeeAsync(UpdateEmployeeRequestVM request)
         {
-            Employee? employee = await GetEmployeeByUsernameAndCheckExist(request.Username);
+            var department = await _departmentReadRepository.FindByIdAsync(request.DepartmentId) ?? throw new DepartmentNotFoundException(request.DepartmentId.ToString());
 
-            employee.NameSurname = request.Name;
+            Employee? employee = await GetEmployeeByIdAndCheckExist(request.Id);
+
+            employee.NameSurname = request.NameSurname;
             employee.Email = request.Mail;
             employee.UserName = request.Username;
             employee.PhoneNumber = request.Phone;
-            employee.DepartmentId = Guid.Parse(request.DepartmentId);
+            employee.DepartmentId = request.DepartmentId;
 
             if (request.TeamId is not null)
-                employee.TeamId = Guid.Parse(request.TeamId);
+                employee.TeamId = request.TeamId;
 
             var result = await _userManager.UpdateAsync(employee);
 

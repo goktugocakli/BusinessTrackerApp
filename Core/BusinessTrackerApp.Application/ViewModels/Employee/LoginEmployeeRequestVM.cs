@@ -1,5 +1,5 @@
 ﻿using System;
-namespace BusinessTrackerApp.Application.ViewModels
+namespace BusinessTrackerApp.Application.ViewModels.Employee
 {
 	public record LoginEmployeeRequestVM
 	{
